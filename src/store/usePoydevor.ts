@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { STONES, totalStones, stoneById, PHASES } from "@/data/curriculum";
-import type { Mode, PhaseId } from "@/data/types";
+import type { PhaseId } from "@/data/types";
 
 /* -----------------------------------------------------------------------
  * Domain helpers
@@ -66,7 +66,6 @@ interface ActivityEntry {
 interface PoydevorState {
   /* === User === */
   onboarded: boolean;
-  mode: Mode;
   name: string;
   email: string;
   avatarColor: string;
@@ -106,8 +105,7 @@ interface PoydevorState {
 
   /* === Actions === */
   hydrateDaily: () => void;
-  setMode: (m: Mode) => void;
-  finishOnboarding: (payload: { name: string; email: string; mode: Mode }) => void;
+  finishOnboarding: (payload: { name: string; email: string }) => void;
   applyDiagnostic: (score: number, phase: PhaseId) => void;
   completeLesson: (stoneId: string) => void;
   completeQuiz: (stoneId: string, correct: number, total: number) => void;
@@ -191,7 +189,7 @@ function yesterday(): string {
 const INITIAL_STONE = STONES[0].id;
 
 /* -----------------------------------------------------------------------
- * Defaults — pre-baked Junior demo state so the journey looks "lived in"
+ * Defaults — pre-baked demo state so the journey looks "lived in"
  * --------------------------------------------------------------------- */
 const DEMO_DEFAULTS = {
   xp: 340,
@@ -212,7 +210,6 @@ export const usePoydevor = create<PoydevorState>()(
   persist(
     (set) => ({
       onboarded: false,
-      mode: "junior",
       name: "",
       email: "",
       avatarColor: NAME_PALETTE[0],
@@ -253,20 +250,12 @@ export const usePoydevor = create<PoydevorState>()(
           return {};
         }),
 
-      setMode: (m) =>
-        set({
-          mode: m,
-          useSound: m === "junior",
-        }),
-
-      finishOnboarding: ({ name, email, mode }) =>
+      finishOnboarding: ({ name, email }) =>
         set((s) => ({
           onboarded: true,
-          mode,
           name,
           email,
           avatarColor: avatarColorFor(name),
-          useSound: mode === "junior",
           activity:
             s.activity.length > 0 ? s.activity : defaultActivity(name),
         })),
@@ -389,7 +378,6 @@ export const usePoydevor = create<PoydevorState>()(
 
       loseHeart: () =>
         set((s) => {
-          if (s.mode !== "junior") return {};
           if (s.hearts <= 0) return {};
           return { hearts: s.hearts - 1, lastHeartLossAt: Date.now() };
         }),
@@ -414,7 +402,6 @@ export const usePoydevor = create<PoydevorState>()(
           onboarded: false,
           name: "",
           email: "",
-          mode: "junior",
           xp: 0,
           streak: 0,
           lastActiveDate: null,

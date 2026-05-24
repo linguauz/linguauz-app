@@ -31,7 +31,6 @@ import { relativeUz } from "@/lib/relativeTime";
  */
 export default function BoshPage() {
   const name = usePoydevor((s) => s.name) || "Sayohatchi";
-  const mode = usePoydevor((s) => s.mode);
   const streak = usePoydevor((s) => s.streak);
   const completed = usePoydevor((s) => s.completedStoneIds);
   const unlocked = usePoydevor((s) => s.unlockedStoneIds);
@@ -55,7 +54,7 @@ export default function BoshPage() {
 
   return (
     <div className="space-y-5 @4xl:space-y-6">
-      <Header name={name} streak={streak} mode={mode} />
+      <Header name={name} streak={streak} />
 
       {/* Phase hero (wide) + Level/Daily (rail). Stacks on small frames. */}
       <div className="grid gap-4 @4xl:gap-6 @4xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
@@ -115,11 +114,9 @@ export default function BoshPage() {
 function Header({
   name,
   streak,
-  mode,
 }: {
   name: string;
   streak: number;
-  mode: "junior" | "senior";
 }) {
   const hearts = usePoydevor((s) => s.hearts);
   return (
@@ -137,23 +134,21 @@ function Header({
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
-        {mode === "junior" && (
-          <div className="hidden @md:flex items-center gap-1 px-3 h-9 rounded-full bg-white/5 border border-white/10">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Heart
-                key={i}
-                size={12}
-                className={cn(
-                  "transition",
-                  i < hearts
-                    ? "text-[var(--danger)] fill-[var(--danger)]"
-                    : "text-white/15",
-                )}
-              />
-            ))}
-            <span className="ml-1.5 text-[11px] font-semibold">{hearts}</span>
-          </div>
-        )}
+        <div className="hidden @md:flex items-center gap-1 px-3 h-9 rounded-full bg-white/5 border border-white/10">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Heart
+              key={i}
+              size={12}
+              className={cn(
+                "transition",
+                i < hearts
+                  ? "text-[var(--danger)] fill-[var(--danger)]"
+                  : "text-white/15",
+              )}
+            />
+          ))}
+          <span className="ml-1.5 text-[11px] font-semibold">{hearts}</span>
+        </div>
         <div className="inline-flex items-center gap-1.5 px-3 h-9 rounded-full bg-[var(--brand-orange)]/12 border border-[var(--brand-orange)]/30 text-[var(--brand-orange)] font-semibold text-[12px]">
           <Flame size={14} />
           <span>{streak} kun</span>

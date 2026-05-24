@@ -28,7 +28,6 @@ export default function MashqPage() {
   const stone = stoneById(params.id);
   const completeQuiz = usePoydevor((s) => s.completeQuiz);
   const loseHeart = usePoydevor((s) => s.loseHeart);
-  const mode = usePoydevor((s) => s.mode);
   const hearts = usePoydevor((s) => s.hearts);
 
   const [idx, setIdx] = useState(0);
@@ -46,7 +45,7 @@ export default function MashqPage() {
       playSound("correct");
     } else {
       playSound("wrong");
-      if (mode === "junior") loseHeart();
+      loseHeart();
     }
     setTimeout(() => {
       if (idx + 1 >= total) {
@@ -77,22 +76,16 @@ export default function MashqPage() {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          {mode === "junior" ? (
-            Array.from({ length: 5 }).map((_, i) => (
-              <Heart
-                key={i}
-                size={14}
-                className={cn(
-                  "transition",
-                  i < hearts ? "text-[var(--danger)] fill-[var(--danger)]" : "text-white/15",
-                )}
-              />
-            ))
-          ) : (
-            <span className="text-[12px] text-[var(--text-muted)]">
-              {correct}/{idx + 1}
-            </span>
-          )}
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Heart
+              key={i}
+              size={14}
+              className={cn(
+                "transition",
+                i < hearts ? "text-[var(--danger)] fill-[var(--danger)]" : "text-white/15",
+              )}
+            />
+          ))}
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 /**
- * Onboarding diagnostika — 3 quick questions that map to a starting Phase.
+ * Onboarding diagnostika — questions that map to a starting Phase
+ * (Ko'lmak / Buloq / Daryo). The score alone decides where the journey begins.
  */
 
 export type DiagQ =

@@ -11,8 +11,6 @@ import {
   User,
   Award,
   Dumbbell,
-  Sprout,
-  GraduationCap,
   Settings,
 } from "lucide-react";
 import { usePoydevor, useLevel } from "@/store/usePoydevor";
@@ -75,12 +73,10 @@ function useNavItems(
 export function Sidebar() {
   const pathname = usePathname();
   const name = usePoydevor((s) => s.name) || "Sayohatchi";
-  const mode = usePoydevor((s) => s.mode);
   const avatarColor = usePoydevor((s) => s.avatarColor);
   const earnedBadges = usePoydevor((s) => s.earnedBadges);
   const completed = usePoydevor((s) => s.completedStoneIds);
   const currentPhase = usePoydevor((s) => s.currentPhase);
-  const setMode = usePoydevor((s) => s.setMode);
   const level = useLevel();
 
   const nav = useNavItems(completed.length, earnedBadges.length);
@@ -150,31 +146,8 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Bottom rail: mode toggle + profile */}
+      {/* Bottom rail: profile */}
       <div className="mt-auto flex flex-col gap-3">
-        <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-1.5 flex">
-          <ModePill
-            active={mode === "junior"}
-            tone="#22d3a5"
-            icon={<Sprout size={14} />}
-            label="Junior"
-            onClick={() => {
-              if (mode !== "junior") setMode("junior");
-              playSound("click");
-            }}
-          />
-          <ModePill
-            active={mode === "senior"}
-            tone="#6c8cff"
-            icon={<GraduationCap size={14} />}
-            label="Senior"
-            onClick={() => {
-              if (mode !== "senior") setMode("senior");
-              playSound("click");
-            }}
-          />
-        </div>
-
         <div className="rounded-2xl border border-white/8 bg-white/[0.04] p-3 flex items-center gap-3">
           <div className="relative shrink-0">
             <div
@@ -258,34 +231,3 @@ function Chip({ chip }: { chip: NavChip }) {
   );
 }
 
-function ModePill({
-  active,
-  tone,
-  icon,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  tone: string;
-  icon: React.ReactNode;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={cn(
-        "flex-1 inline-flex items-center justify-center gap-1.5 h-8 rounded-xl text-[12px] font-semibold transition",
-        active
-          ? "shadow-[inset_0_0_0_1px_currentColor,0_8px_24px_-8px_currentColor]"
-          : "text-[var(--text-muted)] hover:text-white",
-      )}
-      style={active ? { color: tone, background: `color-mix(in oklab, ${tone} 14%, transparent)` } : undefined}
-    >
-      {icon}
-      {label}
-    </button>
-  );
-}

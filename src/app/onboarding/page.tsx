@@ -4,9 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
-  Sprout,
-  GraduationCap,
-  Sparkles,
   Waves,
   Droplets,
   Mountain,
@@ -16,12 +13,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { TopBar } from "@/components/shell/TopBar";
 import { DeviceShell } from "@/components/shell/DeviceShell";
 import { usePoydevor } from "@/store/usePoydevor";
-import type { Mode } from "@/data/types";
-import { MODE_LABEL, MODE_TIER } from "@/data/types";
 import { cn } from "@/lib/cn";
 import { playSound } from "@/lib/sound";
 
-type Step = "intro" | "promise" | "mode" | "name";
+type Step = "intro" | "promise" | "name";
 
 const STAGES = [
   { icon: Droplets, label: "Ko'lmak", tone: "#22d3a5" },
@@ -36,7 +31,6 @@ export default function OnboardingPage() {
   const finishOnboarding = usePoydevor((s) => s.finishOnboarding);
 
   const [step, setStep] = useState<Step>("intro");
-  const [mode, setMode] = useState<Mode>("junior");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
@@ -45,21 +39,19 @@ export default function OnboardingPage() {
   function next() {
     playSound("click");
     if (step === "intro") return setStep("promise");
-    if (step === "promise") return setStep("mode");
-    if (step === "mode") return setStep("name");
+    if (step === "promise") return setStep("name");
   }
 
   function back() {
     playSound("click");
     if (step === "promise") return setStep("intro");
-    if (step === "mode") return setStep("promise");
-    if (step === "name") return setStep("mode");
+    if (step === "name") return setStep("promise");
   }
 
   function startJourney() {
     if (!emailValid) return;
     const finalName = name.trim() || "Sayohatchi";
-    finishOnboarding({ name: finalName, email: email.trim().toLowerCase(), mode });
+    finishOnboarding({ name: finalName, email: email.trim().toLowerCase() });
     playSound("xp");
     router.replace("/diagnostika");
   }
@@ -69,12 +61,9 @@ export default function OnboardingPage() {
       <TopBar />
       <DeviceShell>
         <div className="relative">
-          {/* Soft floating chips background */}
-          <FloatingChipsBg />
-
           {/* Step indicator */}
           <div className="flex items-center justify-center gap-1.5 pt-4">
-            {(["intro", "promise", "mode", "name"] as Step[]).map((s) => (
+            {(["intro", "promise", "name"] as Step[]).map((s) => (
               <span
                 key={s}
                 className={cn(
@@ -112,10 +101,6 @@ export default function OnboardingPage() {
                   Ona tilingni chuqur o'rgan — har qanday tilni zabt etishga
                   tayyor bo'l.
                 </p>
-
-                <div className="mt-6 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--success)]/10 border border-[var(--success)]/30 text-[12px] text-[var(--success)] font-semibold">
-                  <Sparkles size={12} /> 91% foydalanuvchi tasdiqladi
-                </div>
 
                 <PrimaryButton label="Davom etish" onClick={next} />
               </StepShell>
@@ -156,52 +141,9 @@ export default function OnboardingPage() {
                   />
                 </div>
 
-                <div className="flex gap-3 mt-8">
+                <div className="flex items-center gap-3 mt-8">
                   <SecondaryButton label="Orqaga" onClick={back} />
-                  <PrimaryButton label="Davom etish" onClick={next} />
-                </div>
-              </StepShell>
-            )}
-
-            {step === "mode" && (
-              <StepShell key="mode">
-                <h2 className="text-[26px] leading-tight font-[var(--font-display)] font-bold text-center">
-                  Qaysi sayohatni tanlaysiz?
-                </h2>
-                <p className="text-center text-[var(--text-muted)] text-sm mt-2">
-                  Keyinroq profil sahifasida o'zgartirsangiz bo'ladi.
-                </p>
-
-                <div className="space-y-3 mt-6">
-                  <ModeCard
-                    selected={mode === "junior"}
-                    onClick={() => {
-                      setMode("junior");
-                      playSound("click");
-                    }}
-                    icon={<Sprout size={20} />}
-                    title={`${MODE_LABEL.junior} · ${MODE_TIER.junior}`}
-                    subtitle="O'yin, XP, yuraklar va animatsiyalar bilan"
-                    color="#22d3a5"
-                    badge="Gamification"
-                  />
-                  <ModeCard
-                    selected={mode === "senior"}
-                    onClick={() => {
-                      setMode("senior");
-                      playSound("click");
-                    }}
-                    icon={<GraduationCap size={20} />}
-                    title={`${MODE_LABEL.senior} · ${MODE_TIER.senior}`}
-                    subtitle="Soddа, akademik va shovqinsiz"
-                    color="#6c8cff"
-                    badge="Professional"
-                  />
-                </div>
-
-                <div className="flex gap-3 mt-8">
-                  <SecondaryButton label="Orqaga" onClick={back} />
-                  <PrimaryButton label="Davom etish" onClick={next} />
+                  <PrimaryButton label="Davom etish" onClick={next} className="" />
                 </div>
               </StepShell>
             )}
@@ -253,12 +195,13 @@ export default function OnboardingPage() {
                   />
                 </label>
 
-                <div className="flex gap-3 mt-8">
+                <div className="flex items-center gap-3 mt-8">
                   <SecondaryButton label="Orqaga" onClick={back} />
                   <PrimaryButton
                     label="Boshlash"
                     onClick={startJourney}
                     disabled={!emailValid}
+                    className=""
                   />
                 </div>
               </StepShell>
@@ -292,10 +235,12 @@ function PrimaryButton({
   label,
   onClick,
   disabled,
+  className = "mt-8 mx-auto block max-w-xs",
 }: {
   label: string;
   onClick: () => void;
   disabled?: boolean;
+  className?: string;
 }) {
   return (
     <button
@@ -303,7 +248,8 @@ function PrimaryButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "mt-8 mx-auto block w-full max-w-xs h-12 rounded-full bg-gradient-to-r from-[#22d3a5] via-[#00a3ff] to-[#6c8cff] text-white font-semibold shadow-glow-cyan active:scale-[0.98] transition",
+        "w-full h-12 rounded-full bg-gradient-to-r from-[#22d3a5] via-[#00a3ff] to-[#6c8cff] text-white font-semibold shadow-glow-cyan active:scale-[0.98] transition grid place-items-center",
+        className,
         disabled && "opacity-40 pointer-events-none active:scale-100",
       )}
     >
@@ -364,106 +310,6 @@ function PromiseCard({
           </li>
         ))}
       </ul>
-    </div>
-  );
-}
-
-function ModeCard({
-  selected,
-  onClick,
-  icon,
-  title,
-  subtitle,
-  color,
-  badge,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  title: string;
-  subtitle: string;
-  color: string;
-  badge: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "w-full text-left p-4 rounded-2xl transition border",
-        selected
-          ? "border-transparent"
-          : "border-white/10 hover:border-white/20",
-      )}
-      style={
-        selected
-          ? {
-              background: `linear-gradient(135deg, color-mix(in oklab, ${color} 22%, rgba(10,22,40,0.6)), rgba(10,22,40,0.6))`,
-              boxShadow: `0 0 0 2px ${color}, 0 0 32px color-mix(in oklab, ${color} 40%, transparent)`,
-            }
-          : { background: "rgba(255,255,255,0.04)" }
-      }
-    >
-      <div className="flex items-start gap-3">
-        <div
-          className="grid place-items-center h-10 w-10 rounded-xl shrink-0"
-          style={{ background: `color-mix(in oklab, ${color} 26%, transparent)`, color }}
-        >
-          {icon}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="font-[var(--font-display)] font-bold text-base">
-              {title}
-            </span>
-            <span
-              className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold"
-              style={{ color, background: `color-mix(in oklab, ${color} 18%, transparent)` }}
-            >
-              {badge}
-            </span>
-          </div>
-          <p className="text-[12px] text-[var(--text-muted)] mt-1 leading-snug">
-            {subtitle}
-          </p>
-        </div>
-        <span
-          className={cn(
-            "h-5 w-5 rounded-full border-2 transition",
-            selected ? "bg-white border-white" : "border-white/30",
-          )}
-        />
-      </div>
-    </button>
-  );
-}
-
-function FloatingChipsBg() {
-  const items = [
-    { text: "Ega", color: "#3b82f6", x: 10, y: 30, delay: 0 },
-    { text: "Kesim", color: "#ef4444", x: 78, y: 18, delay: 0.8 },
-    { text: "Aniqlovchi", color: "#f59e0b", x: 75, y: 70, delay: 1.4 },
-    { text: "Ravish", color: "#a855f7", x: 8, y: 78, delay: 2 },
-    { text: "Hol", color: "#06b6d4", x: 45, y: 85, delay: 1.1 },
-  ];
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {items.map((it) => (
-        <span
-          key={it.text}
-          className="absolute animate-float-slow text-[11px] font-semibold rounded-full px-2.5 py-1"
-          style={{
-            left: `${it.x}%`,
-            top: `${it.y}%`,
-            color: it.color,
-            background: `color-mix(in oklab, ${it.color} 18%, transparent)`,
-            boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${it.color} 45%, transparent)`,
-            animationDelay: `${it.delay}s`,
-          }}
-        >
-          {it.text}
-        </span>
-      ))}
     </div>
   );
 }

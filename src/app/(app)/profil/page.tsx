@@ -9,15 +9,12 @@ import {
   Trophy,
   Volume2,
   VolumeX,
-  Sprout,
-  GraduationCap,
   RotateCcw,
   LogOut,
   Mail,
 } from "lucide-react";
 import { usePoydevor, useLevel } from "@/store/usePoydevor";
-import { MODE_LABEL, MODE_TIER, MODE_ACCENT } from "@/data/types";
-import { STONES } from "@/data/curriculum";
+import { STONES, PHASES } from "@/data/curriculum";
 import { BADGES } from "@/data/badges";
 import { PageHeader } from "@/components/shell/PageHeader";
 import { cn } from "@/lib/cn";
@@ -27,7 +24,7 @@ export default function ProfilPage() {
   const router = useRouter();
   const name = usePoydevor((s) => s.name) || "Sayohatchi";
   const email = usePoydevor((s) => s.email);
-  const mode = usePoydevor((s) => s.mode);
+  const currentPhase = usePoydevor((s) => s.currentPhase);
   const avatarColor = usePoydevor((s) => s.avatarColor);
   const xp = usePoydevor((s) => s.xp);
   const streak = usePoydevor((s) => s.streak);
@@ -35,16 +32,11 @@ export default function ProfilPage() {
   const earnedBadges = usePoydevor((s) => s.earnedBadges);
   const useSound = usePoydevor((s) => s.useSound);
   const toggleSound = usePoydevor((s) => s.toggleSound);
-  const setMode = usePoydevor((s) => s.setMode);
   const logout = usePoydevor((s) => s.logout);
   const reset = usePoydevor((s) => s.reset);
   const level = useLevel();
 
-  function switchMode(next: typeof mode) {
-    if (next === mode) return;
-    setMode(next);
-    playSound("click");
-  }
+  const phase = PHASES.find((p) => p.id === currentPhase) ?? PHASES[0];
 
   return (
     <div className="space-y-5 @4xl:space-y-6">
@@ -69,7 +61,9 @@ export default function ProfilPage() {
         level={level.level}
         title={level.title}
         progress={level.progress}
-        mode={mode}
+        phaseName={phase.name}
+        phaseEmoji={phase.emoji}
+        phaseAccent={phase.accent}
       />
 
       <div className="grid grid-cols-2 @3xl:grid-cols-4 gap-3">
@@ -103,37 +97,7 @@ export default function ProfilPage() {
         />
       </div>
 
-      <div className="grid @2xl:grid-cols-2 gap-3">
-        <div className="glass rounded-2xl p-4">
-          <div className="text-[11px] uppercase tracking-[0.18em] text-[var(--text-faint)]">
-            Rejim
-          </div>
-          <div className="font-[var(--font-display)] font-bold mb-3">
-            Sayohat uslubi
-          </div>
-          <div className="space-y-2">
-            <ModeRow
-              active={mode === "junior"}
-              onClick={() => switchMode("junior")}
-              icon={<Sprout size={16} />}
-              title={`${MODE_LABEL.junior} · ${MODE_TIER.junior}`}
-              subtitle="Yuraklar, XP, animatsiyalar"
-              tone="#22d3a5"
-            />
-            <ModeRow
-              active={mode === "senior"}
-              onClick={() => switchMode("senior")}
-              icon={<GraduationCap size={16} />}
-              title={`${MODE_LABEL.senior} · ${MODE_TIER.senior}`}
-              subtitle="Sodda, akademik, shovqinsiz"
-              tone="#6c8cff"
-            />
-          </div>
-          <div className="text-[11px] text-[var(--text-muted)] mt-3">
-            Almashtirsangiz XP saqlanadi, faqat ko'rinish o'zgaradi.
-          </div>
-        </div>
-
+      <div className="grid gap-3">
         <div className="glass rounded-2xl p-4">
           <div className="text-[11px] uppercase tracking-[0.18em] text-[var(--text-faint)]">
             Sozlamalar
@@ -220,7 +184,9 @@ function ProfileHero({
   level,
   title,
   progress,
-  mode,
+  phaseName,
+  phaseEmoji,
+  phaseAccent,
 }: {
   name: string;
   email: string;
@@ -228,9 +194,11 @@ function ProfileHero({
   level: number;
   title: string;
   progress: number;
-  mode: "junior" | "senior";
+  phaseName: string;
+  phaseEmoji: string;
+  phaseAccent: string;
 }) {
-  const accent = MODE_ACCENT[mode];
+  const accent = phaseAccent;
   return (
     <div className="relative rounded-3xl p-5 @3xl:p-6 border border-white/8 overflow-hidden glass-strong">
       <div className="flex items-center gap-4">
@@ -302,73 +270,16 @@ function ProfileHero({
                 boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${accent} 45%, transparent)`,
               }}
             >
-              {mode === "junior" ? <Sprout size={13} /> : <GraduationCap size={13} />}
-              {MODE_LABEL[mode]}
+              <span>{phaseEmoji}</span>
+              {phaseName}
               <span className="text-[10px] font-medium opacity-70">
-                · {MODE_TIER[mode]}
+                · Joriy bosqich
               </span>
             </span>
           </div>
         </div>
       </div>
     </div>
-  );
-}
-
-function ModeRow({
-  active,
-  onClick,
-  icon,
-  title,
-  subtitle,
-  tone,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  title: string;
-  subtitle: string;
-  tone: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "w-full flex items-center gap-3 p-3 rounded-xl border transition text-left",
-        active
-          ? "border-transparent"
-          : "border-white/10 hover:border-white/20",
-      )}
-      style={
-        active
-          ? {
-              background: `linear-gradient(135deg, color-mix(in oklab, ${tone} 20%, rgba(10,18,32,0.6)), rgba(10,18,32,0.6))`,
-              boxShadow: `0 0 0 2px ${tone}, 0 0 24px color-mix(in oklab, ${tone} 30%, transparent)`,
-            }
-          : { background: "rgba(255,255,255,0.04)" }
-      }
-    >
-      <span
-        className="grid place-items-center h-9 w-9 rounded-lg"
-        style={{
-          background: `color-mix(in oklab, ${tone} 22%, transparent)`,
-          color: tone,
-        }}
-      >
-        {icon}
-      </span>
-      <div className="flex-1 min-w-0">
-        <div className="text-[13px] font-semibold">{title}</div>
-        <div className="text-[11px] text-[var(--text-muted)]">{subtitle}</div>
-      </div>
-      <span
-        className={cn(
-          "h-4 w-4 rounded-full border-2 transition",
-          active ? "bg-white border-white" : "border-white/30",
-        )}
-      />
-    </button>
   );
 }
 
