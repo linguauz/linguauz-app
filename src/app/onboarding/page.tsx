@@ -17,6 +17,7 @@ import { TopBar } from "@/components/shell/TopBar";
 import { DeviceShell } from "@/components/shell/DeviceShell";
 import { usePoydevor } from "@/store/usePoydevor";
 import type { Mode } from "@/data/types";
+import { MODE_LABEL, MODE_TIER } from "@/data/types";
 import { cn } from "@/lib/cn";
 import { playSound } from "@/lib/sound";
 
@@ -37,6 +38,9 @@ export default function OnboardingPage() {
   const [step, setStep] = useState<Step>("intro");
   const [mode, setMode] = useState<Mode>("junior");
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
   function next() {
     playSound("click");
@@ -53,8 +57,9 @@ export default function OnboardingPage() {
   }
 
   function startJourney() {
+    if (!emailValid) return;
     const finalName = name.trim() || "Sayohatchi";
-    finishOnboarding({ name: finalName, mode });
+    finishOnboarding({ name: finalName, email: email.trim().toLowerCase(), mode });
     playSound("xp");
     router.replace("/diagnostika");
   }
@@ -175,7 +180,7 @@ export default function OnboardingPage() {
                       playSound("click");
                     }}
                     icon={<Sprout size={20} />}
-                    title="Junior"
+                    title={`${MODE_LABEL.junior} · ${MODE_TIER.junior}`}
                     subtitle="O'yin, XP, yuraklar va animatsiyalar bilan"
                     color="#22d3a5"
                     badge="Gamification"
@@ -187,7 +192,7 @@ export default function OnboardingPage() {
                       playSound("click");
                     }}
                     icon={<GraduationCap size={20} />}
-                    title="Senior"
+                    title={`${MODE_LABEL.senior} · ${MODE_TIER.senior}`}
                     subtitle="Soddа, akademik va shovqinsiz"
                     color="#6c8cff"
                     badge="Professional"
@@ -204,18 +209,40 @@ export default function OnboardingPage() {
             {step === "name" && (
               <StepShell key="name">
                 <h2 className="text-[28px] leading-tight font-[var(--font-display)] font-bold text-center">
-                  Ismingizni kiriting 👋
+                  Hisobingizni yarating 👋
                 </h2>
                 <p className="text-center text-[var(--text-muted)] text-sm mt-2">
-                  Sayohatda doim sizga shu nomda murojaat qilamiz.
+                  Email orqali kiring — natijalaringiz shu hisobga bog'lanadi.
                 </p>
 
                 <label className="block mt-8">
                   <span className="text-[11px] uppercase tracking-[0.18em] text-[var(--text-faint)]">
-                    Sizning ismingiz
+                    Email manzilingiz
                   </span>
                   <input
                     autoFocus
+                    type="email"
+                    inputMode="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") startJourney();
+                    }}
+                    placeholder="ism@email.com"
+                    className="mt-2 w-full h-12 px-4 rounded-xl bg-white/5 border border-white/12 focus:border-[var(--brand-aqua)] focus:bg-white/10 outline-none text-[16px] transition"
+                  />
+                  {email.length > 0 && !emailValid && (
+                    <span className="mt-1.5 block text-[11px] text-[var(--danger)]">
+                      To'g'ri email manzil kiriting.
+                    </span>
+                  )}
+                </label>
+
+                <label className="block mt-4">
+                  <span className="text-[11px] uppercase tracking-[0.18em] text-[var(--text-faint)]">
+                    Sizning ismingiz
+                  </span>
+                  <input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     onKeyDown={(e) => {
@@ -228,7 +255,11 @@ export default function OnboardingPage() {
 
                 <div className="flex gap-3 mt-8">
                   <SecondaryButton label="Orqaga" onClick={back} />
-                  <PrimaryButton label="Boshlash" onClick={startJourney} />
+                  <PrimaryButton
+                    label="Boshlash"
+                    onClick={startJourney}
+                    disabled={!emailValid}
+                  />
                 </div>
               </StepShell>
             )}
@@ -260,15 +291,21 @@ function StepShell({ children }: { children: React.ReactNode }) {
 function PrimaryButton({
   label,
   onClick,
+  disabled,
 }: {
   label: string;
   onClick: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="mt-8 mx-auto block w-full max-w-xs h-12 rounded-full bg-gradient-to-r from-[#22d3a5] via-[#00a3ff] to-[#6c8cff] text-white font-semibold shadow-glow-cyan active:scale-[0.98] transition"
+      disabled={disabled}
+      className={cn(
+        "mt-8 mx-auto block w-full max-w-xs h-12 rounded-full bg-gradient-to-r from-[#22d3a5] via-[#00a3ff] to-[#6c8cff] text-white font-semibold shadow-glow-cyan active:scale-[0.98] transition",
+        disabled && "opacity-40 pointer-events-none active:scale-100",
+      )}
     >
       <span className="inline-flex items-center gap-2">
         {label} <ArrowRight size={16} />

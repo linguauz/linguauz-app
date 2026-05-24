@@ -68,6 +68,7 @@ interface PoydevorState {
   onboarded: boolean;
   mode: Mode;
   name: string;
+  email: string;
   avatarColor: string;
 
   /* === Progress === */
@@ -106,7 +107,7 @@ interface PoydevorState {
   /* === Actions === */
   hydrateDaily: () => void;
   setMode: (m: Mode) => void;
-  finishOnboarding: (payload: { name: string; mode: Mode }) => void;
+  finishOnboarding: (payload: { name: string; email: string; mode: Mode }) => void;
   applyDiagnostic: (score: number, phase: PhaseId) => void;
   completeLesson: (stoneId: string) => void;
   completeQuiz: (stoneId: string, correct: number, total: number) => void;
@@ -116,6 +117,7 @@ interface PoydevorState {
   setDeviceFrame: (f: "mobile" | "desktop") => void;
   toggleTheme: () => void;
   setTheme: (t: "dark" | "light") => void;
+  logout: () => void;
   reset: () => void;
 }
 
@@ -212,6 +214,7 @@ export const usePoydevor = create<PoydevorState>()(
       onboarded: false,
       mode: "junior",
       name: "",
+      email: "",
       avatarColor: NAME_PALETTE[0],
 
       xp: DEMO_DEFAULTS.xp,
@@ -256,11 +259,12 @@ export const usePoydevor = create<PoydevorState>()(
           useSound: m === "junior",
         }),
 
-      finishOnboarding: ({ name, mode }) =>
+      finishOnboarding: ({ name, email, mode }) =>
         set((s) => ({
           onboarded: true,
           mode,
           name,
+          email,
           avatarColor: avatarColorFor(name),
           useSound: mode === "junior",
           activity:
@@ -401,10 +405,15 @@ export const usePoydevor = create<PoydevorState>()(
 
       setTheme: (t) => set({ theme: t }),
 
+      // Logout only ends the session — progress, XP and badges stay so a
+      // re-login restores them. Reset wipes everything.
+      logout: () => set({ onboarded: false }),
+
       reset: () =>
         set({
           onboarded: false,
           name: "",
+          email: "",
           mode: "junior",
           xp: 0,
           streak: 0,

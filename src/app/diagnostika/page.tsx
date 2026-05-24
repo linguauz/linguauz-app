@@ -512,7 +512,7 @@ function ResultView({
         <Sparkles size={12} className="text-[var(--brand-aqua)]" />
         Boshlang'ich nuqta:{" "}
         <strong className="text-white">
-          {score >= 100 ? "Daryo 🏞️" : score >= 67 ? "Buloq 🌿" : "Ko'lmak 💧"}
+          {score >= 90 ? "Daryo 🏞️" : score >= 60 ? "Buloq 🌿" : "Ko'lmak 💧"}
         </strong>
       </div>
 

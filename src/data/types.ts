@@ -4,6 +4,28 @@
 
 export type Mode = "junior" | "senior";
 
+/**
+ * Uzbek display names for the two modes. The journey is a master–apprentice
+ * path: a "Shogird" (apprentice) learns with games, an "Ustoz" (master)
+ * works in the calm academic mode.
+ */
+export const MODE_LABEL: Record<Mode, string> = {
+  junior: "Shogird",
+  senior: "Ustoz",
+};
+
+/** English tier kept alongside the Uzbek label, e.g. "Shogird · Junior". */
+export const MODE_TIER: Record<Mode, string> = {
+  junior: "Junior",
+  senior: "Senior",
+};
+
+/** Accent color per mode, shared by onboarding + profile. */
+export const MODE_ACCENT: Record<Mode, string> = {
+  junior: "#22d3a5",
+  senior: "#6c8cff",
+};
+
 export type PhaseId = 1 | 2 | 3 | 4 | 5;
 
 export interface Phase {

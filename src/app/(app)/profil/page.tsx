@@ -13,8 +13,10 @@ import {
   GraduationCap,
   RotateCcw,
   LogOut,
+  Mail,
 } from "lucide-react";
 import { usePoydevor, useLevel } from "@/store/usePoydevor";
+import { MODE_LABEL, MODE_TIER, MODE_ACCENT } from "@/data/types";
 import { STONES } from "@/data/curriculum";
 import { BADGES } from "@/data/badges";
 import { PageHeader } from "@/components/shell/PageHeader";
@@ -24,6 +26,7 @@ import { playSound } from "@/lib/sound";
 export default function ProfilPage() {
   const router = useRouter();
   const name = usePoydevor((s) => s.name) || "Sayohatchi";
+  const email = usePoydevor((s) => s.email);
   const mode = usePoydevor((s) => s.mode);
   const avatarColor = usePoydevor((s) => s.avatarColor);
   const xp = usePoydevor((s) => s.xp);
@@ -33,6 +36,7 @@ export default function ProfilPage() {
   const useSound = usePoydevor((s) => s.useSound);
   const toggleSound = usePoydevor((s) => s.toggleSound);
   const setMode = usePoydevor((s) => s.setMode);
+  const logout = usePoydevor((s) => s.logout);
   const reset = usePoydevor((s) => s.reset);
   const level = useLevel();
 
@@ -60,6 +64,7 @@ export default function ProfilPage() {
 
       <ProfileHero
         name={name}
+        email={email}
         avatarColor={avatarColor}
         level={level.level}
         title={level.title}
@@ -111,7 +116,7 @@ export default function ProfilPage() {
               active={mode === "junior"}
               onClick={() => switchMode("junior")}
               icon={<Sprout size={16} />}
-              title="Junior"
+              title={`${MODE_LABEL.junior} · ${MODE_TIER.junior}`}
               subtitle="Yuraklar, XP, animatsiyalar"
               tone="#22d3a5"
             />
@@ -119,7 +124,7 @@ export default function ProfilPage() {
               active={mode === "senior"}
               onClick={() => switchMode("senior")}
               icon={<GraduationCap size={16} />}
-              title="Senior"
+              title={`${MODE_LABEL.senior} · ${MODE_TIER.senior}`}
               subtitle="Sodda, akademik, shovqinsiz"
               tone="#6c8cff"
             />
@@ -169,6 +174,24 @@ export default function ProfilPage() {
           <button
             type="button"
             onClick={() => {
+              playSound("click");
+              logout();
+              router.replace("/onboarding");
+            }}
+            className="mt-2 w-full flex items-center gap-3 p-3 rounded-xl bg-white/4 border border-white/10 hover:bg-white/8 transition"
+          >
+            <LogOut size={16} className="text-[var(--text-soft)]" />
+            <div className="flex-1 text-left">
+              <div className="text-[13px] font-semibold">Chiqish</div>
+              <div className="text-[11px] text-[var(--text-muted)]">
+                Natijalar saqlanadi, qayta kirishingiz mumkin
+              </div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
               if (confirm("Sayohatni boshidan boshlaysizmi? Hamma natijalar o'chadi.")) {
                 reset();
                 router.replace("/onboarding");
@@ -183,7 +206,6 @@ export default function ProfilPage() {
                 Hamma narsani boshidan boshlang
               </div>
             </div>
-            <LogOut size={14} className="text-white/40" />
           </button>
         </div>
       </div>
@@ -193,6 +215,7 @@ export default function ProfilPage() {
 
 function ProfileHero({
   name,
+  email,
   avatarColor,
   level,
   title,
@@ -200,12 +223,14 @@ function ProfileHero({
   mode,
 }: {
   name: string;
+  email: string;
   avatarColor: string;
   level: number;
   title: string;
   progress: number;
   mode: "junior" | "senior";
 }) {
+  const accent = MODE_ACCENT[mode];
   return (
     <div className="relative rounded-3xl p-5 @3xl:p-6 border border-white/8 overflow-hidden glass-strong">
       <div className="flex items-center gap-4">
@@ -259,19 +284,29 @@ function ProfileHero({
           <div className="font-[var(--font-display)] font-bold text-2xl truncate">
             {name}
           </div>
-          <div className="text-[var(--text-soft)] text-[13px]">
+          {email && (
+            <div className="flex items-center gap-1.5 text-[var(--text-muted)] text-[12px] truncate">
+              <Mail size={12} className="shrink-0" />
+              <span className="truncate">{email}</span>
+            </div>
+          )}
+          <div className="text-[var(--text-soft)] text-[13px] mt-0.5">
             Level {level} · {title}
           </div>
-          <div className="mt-2 inline-flex items-center gap-2">
+          <div className="mt-2 inline-flex items-center gap-1.5">
             <span
-              className={cn(
-                "text-[10px] px-2 py-0.5 rounded-full font-semibold",
-                mode === "junior"
-                  ? "bg-[#22d3a5]/15 text-[#22d3a5]"
-                  : "bg-[#6c8cff]/15 text-[#6c8cff]",
-              )}
+              className="inline-flex items-center gap-1.5 text-[12px] px-2.5 py-1 rounded-full font-semibold"
+              style={{
+                color: accent,
+                background: `color-mix(in oklab, ${accent} 16%, transparent)`,
+                boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${accent} 45%, transparent)`,
+              }}
             >
-              {mode === "junior" ? "Junior" : "Senior"}
+              {mode === "junior" ? <Sprout size={13} /> : <GraduationCap size={13} />}
+              {MODE_LABEL[mode]}
+              <span className="text-[10px] font-medium opacity-70">
+                · {MODE_TIER[mode]}
+              </span>
             </span>
           </div>
         </div>
