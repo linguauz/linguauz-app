@@ -99,13 +99,19 @@ interface PoydevorState {
   dailyTaskDone: number; // 0..3
 
   /* === Settings === */
+  mode: "junior" | "senior";
   useSound: boolean;
   deviceFrame: "mobile" | "desktop";
   theme: "dark" | "light";
 
   /* === Actions === */
   hydrateDaily: () => void;
-  finishOnboarding: (payload: { name: string; email: string }) => void;
+  finishOnboarding: (payload: {
+    name: string;
+    email: string;
+    mode?: "junior" | "senior";
+  }) => void;
+  setMode: (m: "junior" | "senior") => void;
   applyDiagnostic: (score: number, phase: PhaseId) => void;
   completeLesson: (stoneId: string) => void;
   completeQuiz: (stoneId: string, correct: number, total: number) => void;
@@ -236,6 +242,7 @@ export const usePoydevor = create<PoydevorState>()(
       dailyTaskDate: today(),
       dailyTaskDone: 1,
 
+      mode: "junior",
       useSound: true,
       deviceFrame: "mobile",
       theme: "dark",
@@ -250,15 +257,18 @@ export const usePoydevor = create<PoydevorState>()(
           return {};
         }),
 
-      finishOnboarding: ({ name, email }) =>
+      finishOnboarding: ({ name, email, mode }) =>
         set((s) => ({
           onboarded: true,
           name,
           email,
+          ...(mode ? { mode, useSound: mode === "junior" } : {}),
           avatarColor: avatarColorFor(name),
           activity:
             s.activity.length > 0 ? s.activity : defaultActivity(name),
         })),
+
+      setMode: (m) => set({ mode: m, useSound: m === "junior" }),
 
       applyDiagnostic: (score, phase) =>
         set((s) => {
