@@ -107,6 +107,15 @@ export type LessonCard =
       chips: ColoredWord[];
       slots: GrammarRole[];
     }
+  | {
+      // Non-grammar ordering — syllables, morphemes. Tokens are stored in the
+      // correct order; the UI shuffles them for the learner.
+      type: "arrange";
+      title: string;
+      prompt: string;
+      tokens: string[];
+      note?: string;
+    }
   | { type: "note"; title: string; body: string }
   | { type: "outro"; title: string; xp: number };
 

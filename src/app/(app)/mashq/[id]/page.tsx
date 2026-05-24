@@ -12,6 +12,16 @@ import { cn } from "@/lib/cn";
 import { playSound } from "@/lib/sound";
 import { Confetti } from "@/components/fx/Confetti";
 
+/** Fisher–Yates — shuffles a copy so options/chips never start in answer order. */
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 export default function MashqPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -179,6 +189,7 @@ function ChoiceView({
 }) {
   const [pick, setPick] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
+  const [order] = useState(() => shuffle(q.options.map((_, i) => i)));
 
   function check() {
     if (pick == null) return;
@@ -190,7 +201,8 @@ function ChoiceView({
     <div className="glass-strong rounded-3xl p-5">
       <QuestionHeader index={0} total={1} prompt={q.prompt} />
       <div className="mt-5 space-y-2">
-        {q.options.map((opt, i) => {
+        {order.map((i, pos) => {
+          const opt = q.options[i];
           const isPick = pick === i;
           const isAnswer = i === q.answer;
           const tone = revealed
@@ -232,7 +244,7 @@ function ChoiceView({
                 ) : tone === "wrong" ? (
                   <X size={14} />
                 ) : (
-                  String.fromCharCode(65 + i)
+                  String.fromCharCode(65 + pos)
                 )}
               </span>
               <span className="text-[14px]">{opt}</span>
@@ -322,6 +334,7 @@ function FillView({
 }) {
   const [pick, setPick] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
+  const [order] = useState(() => shuffle(q.options.map((_, i) => i)));
 
   function pickOption(i: number) {
     if (revealed) return;
@@ -353,7 +366,8 @@ function FillView({
         <span className="text-[var(--text-soft)]">{q.after}</span>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        {q.options.map((opt, i) => {
+        {order.map((i) => {
+          const opt = q.options[i];
           const isPick = pick === i;
           const isAnswer = i === q.answer;
           const tone = revealed
@@ -467,6 +481,7 @@ function OrderView({
 }) {
   const [placed, setPlaced] = useState<number[]>([]);
   const [revealed, setRevealed] = useState(false);
+  const [order] = useState(() => shuffle(q.chips.map((_, i) => i)));
 
   function pickChip(i: number) {
     if (revealed) return;
@@ -522,7 +537,8 @@ function OrderView({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        {q.chips.map((c, i) => {
+        {order.map((i) => {
+          const c = q.chips[i];
           const used = placed.includes(i);
           return (
             <button

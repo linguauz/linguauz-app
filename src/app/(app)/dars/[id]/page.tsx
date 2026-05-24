@@ -190,6 +190,7 @@ function CardRenderer({ card }: { card: LessonCard }) {
   if (card.type === "examples") return <ExamplesCard card={card} />;
   if (card.type === "tap") return <TapCard card={card} />;
   if (card.type === "build") return <BuildCard card={card} />;
+  if (card.type === "arrange") return <ArrangeCard card={card} />;
   if (card.type === "note") return <NoteCard card={card} />;
   return <OutroCard card={card} />;
 }
@@ -432,6 +433,107 @@ function BuildCard({ card }: { card: Extract<LessonCard, { type: "build" }> }) {
   );
 }
 
+function ArrangeCard({
+  card,
+}: {
+  card: Extract<LessonCard, { type: "arrange" }>;
+}) {
+  // Shuffle once per mount so the chips never start in the answer order.
+  const [order] = useState(() => shuffle(card.tokens.map((_, i) => i)));
+  const [placed, setPlaced] = useState<number[]>([]);
+  const [phase, setPhase] = useState<"idle" | "correct" | "wrong">("idle");
+
+  function pick(i: number) {
+    if (phase === "correct" || placed.includes(i)) return;
+    const next = [...placed, i];
+    setPlaced(next);
+    playSound("click");
+    if (next.length === card.tokens.length) {
+      const ok = next.every((v, slot) => v === slot);
+      if (ok) {
+        setPhase("correct");
+        playSound("correct");
+      } else {
+        setPhase("wrong");
+        playSound("wrong");
+        setTimeout(() => {
+          setPhase("idle");
+          setPlaced([]);
+        }, 700);
+      }
+    }
+  }
+
+  function removeAt(slot: number) {
+    if (phase === "correct") return;
+    setPlaced((p) => p.filter((_, i) => i !== slot));
+  }
+
+  return (
+    <div className="glass-strong rounded-3xl p-5">
+      <div className="text-[11px] uppercase tracking-[0.18em] text-[var(--text-faint)]">
+        Qurish
+      </div>
+      <h2 className="font-[var(--font-display)] font-bold text-xl mt-1">
+        {card.title}
+      </h2>
+      <p className="text-[var(--text-soft)] mt-1 text-sm">{card.prompt}</p>
+
+      <div
+        className={cn(
+          "mt-4 p-3 rounded-2xl min-h-[60px] flex flex-wrap gap-2 items-center border-2 border-dashed",
+          phase === "correct" && "border-[var(--success)] bg-[var(--success)]/10",
+          phase === "wrong" && "border-[var(--danger)] bg-[var(--danger)]/10 animate-shake",
+          phase === "idle" && "border-white/15 bg-white/3",
+        )}
+      >
+        {placed.length === 0 && (
+          <span className="text-[12px] text-[var(--text-faint)] mx-auto">
+            Bo'laklarni shu yerga joylashtiring
+          </span>
+        )}
+        {placed.map((tokIdx, slot) => (
+          <button
+            key={slot}
+            onClick={() => removeAt(slot)}
+            disabled={phase === "correct"}
+            className="px-3 py-2 rounded-xl bg-gradient-to-br from-[#22d3a5]/30 to-[#00a3ff]/30 border border-white/15 text-sm font-medium"
+          >
+            {card.tokens[tokIdx]}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        {order.map((tokIdx) => {
+          const used = placed.includes(tokIdx);
+          return (
+            <button
+              key={tokIdx}
+              disabled={used || phase === "correct"}
+              onClick={() => pick(tokIdx)}
+              className={cn(
+                "px-3 py-2 rounded-xl text-sm border transition",
+                used
+                  ? "bg-white/2 border-white/5 text-[var(--text-faint)] line-through cursor-not-allowed"
+                  : "bg-white/5 border-white/12 hover:bg-white/10",
+              )}
+            >
+              {card.tokens[tokIdx]}
+            </button>
+          );
+        })}
+      </div>
+
+      {phase === "correct" && (
+        <div className="mt-4 p-3 rounded-xl bg-[var(--success)]/15 border border-[var(--success)]/30 text-[var(--success)] text-sm">
+          ✓ To'g'ri tartib!{card.note ? ` ${card.note}` : ""}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function NoteCard({ card }: { card: Extract<LessonCard, { type: "note" }> }) {
   return (
     <div
@@ -486,6 +588,15 @@ function OutroCard({ card }: { card: Extract<LessonCard, { type: "outro" }> }) {
 /* ============================================================
  * Helpers
  * ============================================================ */
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 function SentenceRow({
   words,

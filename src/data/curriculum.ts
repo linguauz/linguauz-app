@@ -83,7 +83,7 @@ export const STONES: Stone[] = [
         type: "intro",
         title: "Tovushdan so'z — so'zdan fikr",
         hook:
-          "Til — bu tovushlardan boshlanadi. O'zbek tilida 32 ta harf va 30 ta tovush bor. Birinchi qadam — ularni tanish.",
+          "Til — bu tovushlardan boshlanadi. O'zbek lotin yozuvida 29 ta harf va 3 ta harf birikmasi (sh, ch, ng) bor. Birinchi qadam — ularni tanish.",
       },
       {
         type: "rule",
@@ -108,14 +108,11 @@ export const STONES: Stone[] = [
           "Jarangli undoshlar tovush chiqaradi (bo'g'iz titraydi), jarangsizlar yo'q.",
       },
       {
-        type: "build",
+        type: "arrange",
         title: "Bo'g'inga bo'lish",
-        prompt: "Quyidagi so'zni bo'g'inga to'g'ri ajrating: maktab",
-        chips: [
-          { text: "mak" },
-          { text: "tab" },
-        ],
-        slots: ["ega", "kesim"], // chip slots — not grammar here, just two
+        prompt: "Bo'g'inlarni to'g'ri tartibda joylashtiring: maktab",
+        tokens: ["mak", "tab"],
+        note: "Ikki unli — ikki bo'g'in: mak-tab.",
       },
       {
         type: "note",
@@ -161,12 +158,13 @@ export const STONES: Stone[] = [
       },
       {
         type: "fill",
-        prompt: "Bo'sh joyga to'g'ri so'z qo'shing",
-        before: "O'zbek tilida",
-        after: "harf bor.",
-        options: ["28", "30", "32", "34"],
-        answer: 2,
-        explain: "Lotin imlosida 32 ta harf — alifbo to'liq.",
+        prompt: "Bo'sh joyga to'g'ri son qo'shing",
+        before: "O'zbek lotin yozuvida",
+        after: "ta harf bor.",
+        options: ["26", "29", "32", "34"],
+        answer: 1,
+        explain:
+          "29 ta harf. Ularga qo'shimcha 3 ta harf birikmasi (sh, ch, ng) ham bor.",
       },
     ],
   },
@@ -424,11 +422,11 @@ export const STONES: Stone[] = [
       {
         type: "tap",
         title: "Sifatni toping",
-        prompt: "Sifatni bosing",
+        prompt: "Aniqlovchini (sifatni) bosing",
         sentence: [
-          { text: "Yashil" },
-          { text: "olma", role: "aniqlovchi" },
-          { text: "shirin" },
+          { text: "Yashil", role: "aniqlovchi" },
+          { text: "olma" },
+          { text: "uzildi" },
         ],
         targetRole: "aniqlovchi",
       },
@@ -436,7 +434,7 @@ export const STONES: Stone[] = [
         type: "note",
         title: "💡 Eslatma",
         body:
-          "Ingliz tilida sifat va ravish farqi -ly qo'shimcha bilan: good → goodly. O'zbek tilida bu farq so'z o'zgarishi emas, joylashishida ko'rinadi.",
+          "Ingliz tilida ko'p ravishlar -ly qo'shimchasi bilan yasaladi: quick → quickly (tez), slow → slowly (sekin). O'zbek tilida sifat va ravish farqi qo'shimchada emas, joylashishida ko'rinadi.",
       },
       { type: "outro", title: "Phase 1 ni tugatdingiz! 💧→🌿", xp: 70 },
     ],
@@ -457,10 +455,11 @@ export const STONES: Stone[] = [
       },
       {
         type: "truefalse",
-        prompt: "O'zbek tilida sifat doim otdan oldin keladi.",
-        claim: "'Katta uy' to'g'ri, 'uy katta' tarkibida emas.",
+        prompt: "Aniqlovchi vazifasidagi sifat otdan oldin keladi.",
+        claim: "'Katta uy' — sifat (katta) ot (uy) oldida turibdi.",
         answer: true,
-        explain: "Sifat aniqlovchi sifatida — ot oldida.",
+        explain:
+          "Aniqlovchi bo'lganda sifat ot oldida: 'katta uy'. (Kesim bo'lsa keyin keladi: 'Uy katta'.)",
       },
       {
         type: "order",
@@ -526,10 +525,10 @@ export const STONES: Stone[] = [
       {
         type: "tap",
         title: "Aniqlovchini toping",
-        prompt: "Sifatni bosing",
+        prompt: "Aniqlovchini (sifatni) bosing",
         sentence: [
-          { text: "Yumshoq" },
-          { text: "yostiq", role: "aniqlovchi" },
+          { text: "Yumshoq", role: "aniqlovchi" },
+          { text: "yostiq" },
           { text: "yoqdi" },
         ],
         targetRole: "aniqlovchi",
@@ -608,7 +607,7 @@ export const STONES: Stone[] = [
         examples: [
           [{ text: "ish + chi = ishchi (kasb)" }],
           [{ text: "bahor + iy = bahoriy (sifat)" }],
-          [{ text: "non + voy = nonvoy (kasb)" }],
+          [{ text: "bog' + bon = bog'bon (kasb)" }],
         ],
       },
       {
@@ -623,14 +622,11 @@ export const STONES: Stone[] = [
           "Bu qo'shimchalar yangi so'z yasamaydi — faqat shakl o'zgartiradi.",
       },
       {
-        type: "build",
+        type: "arrange",
         title: "Yangi so'z yasang",
-        prompt: "Tegishli qo'shimchani tanlang",
-        chips: [
-          { text: "non" },
-          { text: "voy" },
-        ],
-        slots: ["ega", "kesim"],
+        prompt: "O'zak va qo'shimchani to'g'ri tartibda joylashtiring: ishchi",
+        tokens: ["ish", "chi"],
+        note: "Avval o'zak (ish), keyin so'z yasovchi qo'shimcha (-chi).",
       },
       {
         type: "note",
@@ -651,11 +647,11 @@ export const STONES: Stone[] = [
       {
         type: "fill",
         prompt: "Yangi so'z yasang",
-        before: "non",
+        before: "bog'",
         after: "(kasb)",
-        options: ["+voy", "+da", "+lar", "+ni"],
+        options: ["+bon", "+da", "+lar", "+ni"],
         answer: 0,
-        explain: "Non+voy = nonvoy — non yopadigan kasb egasi.",
+        explain: "Bog'+bon = bog'bon — bog' parvarishlovchi kasb egasi.",
       },
       {
         type: "truefalse",
@@ -696,7 +692,7 @@ export const STONES: Stone[] = [
         type: "intro",
         title: "Ikkita so'z — bitta ma'no",
         hook:
-          "O'zbek tilida ikki so'z birikib yangi tushuncha yaratadi: qo'lbola, temir yo'l, sariq sariyog'.",
+          "O'zbek tilida ikki so'z birikib yangi tushuncha yaratadi: qo'lbola, temir yo'l, ko'zoynak.",
       },
       {
         type: "rule",
@@ -704,7 +700,7 @@ export const STONES: Stone[] = [
         rule:
           "Ikkita o'zak qo'shilib bir tushunchani bildiradi. Ba'zilari qo'shib, ba'zilari ajratib yoziladi.",
         examples: [
-          [{ text: "ko'l + bola = ko'lbola" }],
+          [{ text: "qo'l + bola = qo'lbola" }],
           [{ text: "temir + yo'l = temir yo'l" }],
           [{ text: "bel + bog' = belbog'" }],
         ],
@@ -840,16 +836,16 @@ export const STONES: Stone[] = [
     quiz: [
       {
         type: "choice",
-        prompt: "Qaysi gapda ko'plik to'g'ri ishlatilgan?",
+        prompt: "Qaysi gapda ko'plik qo'shimchasi to'g'ri ishlatilgan?",
         options: [
           "Ikki bolalar keldi",
+          "Uchta kitoblar bor",
+          "Ko'p odamlar keldi",
           "Bolalar keldi",
-          "Ikki bola keldi",
-          "B va C to'g'ri",
         ],
         answer: 3,
         explain:
-          "Aniq sondan keyin -lar shart emas, lekin sondan tashqari -lar mumkin.",
+          "'Bolalar keldi' to'g'ri. Aniq son yoki miqdor so'zidan keyin -lar takrorlanmaydi (ikki bola, ko'p odam).",
       },
       {
         type: "fill",
@@ -1012,7 +1008,7 @@ export const STONES: Stone[] = [
         examples: [
           [{ text: "bordi — o'tgan zamon" }],
           [{ text: "bormoqda — hozirgi zamon" }],
-          [{ text: "boradi — kelasi zamon" }],
+          [{ text: "boradi — hozirgi-kelasi zamon" }],
         ],
       },
       {
@@ -1055,12 +1051,12 @@ export const STONES: Stone[] = [
       },
       {
         type: "fill",
-        prompt: "Kelasi zamon shaklini tanlang",
+        prompt: "Hozirgi-kelasi zamon shaklini tanlang",
         before: "Men maktabga",
         after: "",
         options: ["bordim", "boraman", "bormoqdaman", "borganman"],
         answer: 1,
-        explain: "'Boraman' — kelasi zamon, 1-shaxs birlik.",
+        explain: "'Boraman' — hozirgi-kelasi zamon, 1-shaxs birlik.",
       },
       {
         type: "tap",
@@ -1235,9 +1231,9 @@ export const STONES: Stone[] = [
         title: "Olmoshni toping",
         prompt: "Olmoshni bosing",
         sentence: [
-          { text: "Kitob" },
-          { text: "men", role: "ega" },
-          { text: "ga" },
+          { text: "U", role: "ega" },
+          { text: "kitobni" },
+          { text: "o'qidi" },
         ],
         targetRole: "ega",
       },
@@ -1275,10 +1271,11 @@ export const STONES: Stone[] = [
       },
       {
         type: "truefalse",
-        prompt: "'U' — ko'rsatish olmoshi.",
-        claim: "U — uchinchi shaxs kishilik olmoshi.",
-        answer: false,
-        explain: "U — kishilik olmoshi. 'Bu/shu/o'sha' ko'rsatish olmoshi.",
+        prompt: "'Bu, shu, o'sha' — ko'rsatish olmoshlari.",
+        claim: "Bu so'zlar predmetni ko'rsatib turadi.",
+        answer: true,
+        explain:
+          "'Bu, shu, o'sha' — ko'rsatish olmoshlari. 'Men, sen, u' esa kishilik olmoshlari.",
       },
       {
         type: "order",
@@ -1318,7 +1315,7 @@ export const STONES: Stone[] = [
           "Bundan keyin har bir gapda ega ko'k rang bilan belgilanadi. Esda tuting!",
         example: [
           { text: "Kamola", role: "ega" },
-          { text: "maktabga", role: "ega" },
+          { text: "maktabga" },
           { text: "bordi", role: "kesim" },
         ],
       },
@@ -1481,10 +1478,10 @@ export const STONES: Stone[] = [
       },
       {
         type: "tap",
-        prompt: "Kesimni toping: 'U shifokor edi'",
+        prompt: "Ot-kesimni toping: 'U shifokor edi'",
         sentence: ["U", "shifokor", "edi"],
-        answerIndex: 2,
-        explain: "Edi — kesimning yordamchi qismi (bog'lama).",
+        answerIndex: 1,
+        explain: "Shifokor — ot-kesim (kim edi?). 'Edi' — yordamchi bog'lama.",
       },
       {
         type: "truefalse",
